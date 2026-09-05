@@ -6,10 +6,14 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Importación del middleware de logger
+import { loggerMiddleware } from './middlewares/loggerMiddleware.js';
+
 // Inicialización de Express
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+// Registrar el middleware de logs antes de definir las rutas
+app.use(loggerMiddleware);
 // Configuración de __dirname 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
