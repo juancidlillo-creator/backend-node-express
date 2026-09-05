@@ -1,0 +1,27 @@
+{
+  "name": "backend-node-express",
+  "version": "1.0.0",
+  "description": "Servidor backend con Node.js y Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juancidlillo-creator/backend-node-express.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/juancidlillo-creator/backend-node-express/issues"
+  },
+  "homepage": "https://github.com/juancidlillo-creator/backend-node-express#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
+  }
+}
