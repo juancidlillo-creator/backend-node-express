@@ -1,20 +1,51 @@
-// Carga las variables de entorno desde el archivo .env a process.env
+// Carga de variables de entorno
 import 'dotenv/config';
-// Importa el framework Express para la creación del servidor y gestión de rutas
+
+// Importación de módulos y dependencias
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Inicializa la aplicación de Express
+// Inicialización de Express
 const app = express();
-
-// Define el puerto del servidor desde process.env.PORT; si no existe, asigna 3000 por defecto
 const PORT = process.env.PORT || 3000;
 
-// Configura una ruta de prueba básica en la raíz
-app.get('/', (req, res) => {
-    res.send('Servidor en ejecución');
+// Configuración de __dirname 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Configuración del motor de plantillas HBS
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Ruta dinámica renderizada con HBS
+app.get('/vistaDinamica', (req, res) => {
+    res.render('index', {
+        titulo: 'Vista Dinámica',
+        mensaje: 'Hola, Este contenido fue inyectado desde el servidor Express.',
+        estado: 'Activo'
+    });
 });
 
-// Pone el servidor a escuchar en el puerto 3000 
+//Configuración del middleware express.static() para la carpeta /public
+app.use(express.static(path.join(__dirname, 'public')));
+
+//Ruta raíz (/): Envía el archivo HTML estático o una respuesta directa
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+//Ruta de estado (/status): Devuelve un objeto en formato JSON
+app.get('/status', (req, res) => {
+    res.json({
+        status: 'online',
+        timestamp: new Date().toISOString(),
+        nodeVersion: process.version,
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Ejecutar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor iniciado y escuchando en el puerto ${PORT}`);
+    console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
