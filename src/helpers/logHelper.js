@@ -6,9 +6,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Definición de las rutas del directorio de logs y del archivo access.log
-const logsDir = path.join(__dirname, '../logs');
-const logFilePath = path.join(logsDir, 'access.log');
+// Definición de las rutas del directorio de logs
+const logsDir = path.join(__dirname, '../../logs');
+const accessLogPath = path.join(logsDir, 'access.log');
+const transactionLogPath = path.join(logsDir, 'transactions.log');
 
 /**
  * Función asíncrona que registra una entrada en el archivo de texto access.log.
@@ -16,20 +17,31 @@ const logFilePath = path.join(logsDir, 'access.log');
  * @param {string} ruta - Ruta accedida por el cliente
  */
 export const registrarAcceso = async (metodo, ruta) => {
-    // Obtención de fecha y hora actual en formato estándar ISO
     const fechaHora = new Date().toISOString();
-    
-    // Estructura mínima requerida: fecha, hora, método y ruta accedida
     const logCreado = `[${fechaHora}] METODO: ${metodo} | RUTA: ${ruta}\n`;
 
     try {
-        // Garantiza la existencia del directorio 'logs' si aún no existe
         await fs.mkdir(logsDir, { recursive: true });
-
-        // Agrega la línea al final del archivo access.log usando fs.appendFile()
-        await fs.appendFile(logFilePath, logCreado, 'utf-8');
+        await fs.appendFile(accessLogPath, logCreado, 'utf-8');
     } catch (error) {
-        // Manejo de errores
         console.error('Error al registrar log de acceso:', error.message);
+    }
+};
+
+/**
+ * Función asíncrona que registra transacciones fallidas con rollback en transactions.log.
+ * (Módulo 7 - Tarea PLUS Lección 4)
+ * @param {string} operacion - Nombre de la operación transaccional
+ * @param {string} detalleError - Causa del error o rollback
+ */
+export const registrarFalloTransaccion = async (operacion, detalleError) => {
+    const fechaHora = new Date().toISOString();
+    const logFallo = `[${fechaHora}] TRANSACCION_FALLIDA | OPERACION: ${operacion} | ERROR: ${detalleError} | ACCION: ROLLBACK_EJECUTADO\n`;
+
+    try {
+        await fs.mkdir(logsDir, { recursive: true });
+        await fs.appendFile(transactionLogPath, logFallo, 'utf-8');
+    } catch (error) {
+        console.error('Error al registrar log de transacción fallida:', error.message);
     }
 };
