@@ -21,6 +21,10 @@ const Usuario = sequelize.define('Usuario', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    foto: { 
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     estado: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
