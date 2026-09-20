@@ -1,50 +1,53 @@
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs/promises';
 
-// Configuración de almacenamiento en el disco duro
+// Configuración de almacenamiento
 const almacenamientoArchivos = multer.diskStorage({
-    destination: (req, file, callback) =>{
+    destination: async (req, file, callback) => {
         const carpetaDestino = 'uploads/';
 
-        // Si la carpeta no existe, la crea automáticamente
-        if (!fs.existsSync(carpetaDestino)) {
-            fs.mkdirSync(carpetaDestino, { recursive: true });
+        try {
+            await fs.access(carpetaDestino);
+        } catch (error) {
+            try {
+                await fs.mkdir(carpetaDestino, { recursive: true });
+            } catch (errorCreacion) {
+                return callback(errorCreacion, null);
+            }
         }
 
         callback(null, carpetaDestino);
     },
+
     filename: (req, file, callback) => {
-        // Genera un sufijo único usando la fecha actual y un número aleatorio
         const sufijoUnico = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const extensionArchivo = path.extname(file.originalname);
-        
-        // Ejemplo de resultado: 17123456789-123456789.png
         callback(null, sufijoUnico + extensionArchivo);
     }
 });
 
-// Función para verificar que el archivo subido sea únicamente una imagen
+// Filtro de archivos corregido
 const filtroArchivos = (req, file, callback) => {
-    // Expresión regular con las extensiones de imágenes permitidas
     const extensionesPermitidas = /jpeg|jpg|png|gif|webp/;
-    
-    // Verificación de tipo MIME y de la extensión del archivo original
+
     const tipoMimeValido = extensionesPermitidas.test(file.mimetype);
     const extensionValida = extensionesPermitidas.test(path.extname(file.originalname).toLowerCase());
 
     if (tipoMimeValido && extensionValida) {
+        // Archivo aceptado
         return callback(null, true);
     }
 
-    callback(new Error('Error: El archivo debe ser una imagen válida (jpeg, jpg, png, gif, webp)'));
+    // Archivo rechazado (pasamos un objeto Error al primer argumento)
+    callback(new Error('Error: El archivo debe ser una imagen válida (jpeg, jpg, png, gif, webp)'), false);
 };
 
-// Configuración principal del middleware de subida
+// Middleware principal
 export const uploadMiddleware = multer({
     storage: almacenamientoArchivos,
     fileFilter: filtroArchivos,
     limits: { 
-        fileSize: 2 * 1024 * 1024 // Límite de tamaño: 2 Megabytes
+        fileSize: 2 * 1024 * 1024 // 2 Megabytes
     }
 });
