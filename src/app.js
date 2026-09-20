@@ -13,7 +13,7 @@ import { loggerMiddleware } from './middlewares/loggerMiddleware.js';
 import mainRouter from './routes/router.js';
 import usuarioRoutes from './routes/usuarioRouters.js'
 import pedidoRoutes from './routes/pedidoRouters.js';
-
+import uploadRoutes from './routes/uploadRouters.js';
 
 // Inicialización de Express
 const app = express();
@@ -35,7 +35,10 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, '../views'));
 
 // Servir archivos estáticos (Módulo 6)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
+
+//Hacer la carpeta uploads/ accesible públicamente
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Integración del router principal 
 app.use('/', mainRouter);
@@ -43,6 +46,7 @@ app.use('/', mainRouter);
 // Registrar rutas de la API
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/pedidos', pedidoRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Inicio del servidor HTTP
 const iniciarServidor = async () => {
