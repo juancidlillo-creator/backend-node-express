@@ -12,6 +12,8 @@ import { loggerMiddleware } from './middlewares/loggerMiddleware.js';
 // Importar rutas
 import mainRouter from './routes/router.js';
 import usuarioRoutes from './routes/usuarioRouters.js'
+import pedidoRoutes from './routes/pedidoRouters.js';
+
 
 // Inicialización de Express
 const app = express();
@@ -37,9 +39,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Integración del router principal 
 app.use('/', mainRouter);
+
 // Registrar rutas de la API
 app.use('/api/usuarios', usuarioRoutes);
-
+app.use('/api/pedidos', pedidoRoutes);
 
 // Inicio del servidor HTTP
 const iniciarServidor = async () => {
