@@ -1,7 +1,7 @@
 import { sequelize } from '../models/index.js';
 import Usuario from '../models/Usuario.js';
 import Pedido from '../models/Pedido.js';
-import { registrarFalloTransaccion } from '../helpers/logHelper.js'; // Ajusta la ruta a tu helper
+import { registrarFalloTransaccion } from '../helpers/logHelper.js'; 
 
 export const crearUsuarioYPedido = async (req, res) => {
     const t = await sequelize.transaction();
