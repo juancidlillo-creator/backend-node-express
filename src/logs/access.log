@@ -1,0 +1,14 @@
+[2026-09-20T17:40:50.895Z] METODO: GET | RUTA: /usuarios
+[2026-09-20T17:41:55.693Z] METODO: GET | RUTA: /api/usuarios
+[2026-09-20T17:42:51.569Z] METODO: GET | RUTA: /api/usuarios
+[2026-09-20T17:48:42.096Z] METODO: GET | RUTA: /api/usuarios
+[2026-09-20T17:49:30.780Z] METODO: GET | RUTA: /api/usuarios/3
+[2026-09-20T17:49:34.365Z] METODO: GET | RUTA: /api/usuarios/3
+[2026-09-20T17:50:02.703Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
+[2026-09-20T17:50:25.970Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
+[2026-09-20T17:51:35.776Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
+[2026-09-20T17:53:36.317Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
+[2026-09-20T17:53:45.496Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
+[2026-09-20T17:55:07.929Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
+[2026-09-20T17:55:20.504Z] METODO: GET | RUTA: /api/usuarios
+[2026-09-20T17:55:25.437Z] METODO: GET | RUTA: /api/usuarios?nombre=Juan
