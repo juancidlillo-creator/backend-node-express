@@ -30,7 +30,7 @@ app.use(loggerMiddleware);
 
 // Configuración del motor de vistas HBS (Módulo 6)
 app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '../views'));
 
 // Servir archivos estáticos (Módulo 6)
 app.use(express.static(path.join(__dirname, 'public')));

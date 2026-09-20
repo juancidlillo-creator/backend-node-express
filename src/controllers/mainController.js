@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 // Servir la página principal de contenido estático (HTML)
 export const renderHome = (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../public', 'index.html'));
 };
 
 
