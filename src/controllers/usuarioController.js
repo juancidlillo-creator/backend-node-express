@@ -66,3 +66,46 @@ export const crearUsuario = async (req, res) => {
     }
 };
 
+// PUT /usuarios/:id
+export const actualizarUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, email } = req.body;
+
+        const usuario = await Usuario.findByPk(id);
+        if (!usuario) {
+        return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+        }
+
+        // Actualizamos únicamente los valores que vengan presentes en el body
+        await usuario.update({
+        ...(nombre && { nombre }),
+        ...(email && { email })
+        });
+
+        const { password: _, ...usuarioSinPassword } = usuario.toJSON();
+
+        res.status(200).json({ mensaje: 'Usuario actualizado', usuario: usuarioSinPassword });
+    } catch (error) {
+        console.error('Error al actualizar el usuario:', error);
+        res.status(500).json({ mensaje: 'Error al actualizar el usuario', error: error.message });
+    }
+};
+
+// DELETE /usuarios/:id
+export const eliminarUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const filasEliminadas = await Usuario.destroy({ where: { id } });
+
+        if (filasEliminadas === 0) {
+        return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+        }
+
+        res.status(200).json({ mensaje: 'Usuario eliminado' });
+    } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+        res.status(500).json({ mensaje: 'Error al eliminar el usuario', error: error.message });
+    }
+};
