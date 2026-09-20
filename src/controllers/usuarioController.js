@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import Usuario from '../models/Usuario.js';
+import {Pedido} from '../models/index.js'
 
 
 // GET /usuarios
@@ -107,5 +108,42 @@ export const eliminarUsuario = async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar el usuario:', error);
         res.status(500).json({ mensaje: 'Error al eliminar el usuario', error: error.message });
+    }
+};
+
+// GET /api/usuarios/:id/pedidos
+export const obtenerUsuarioConPedidos = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const usuario = await Usuario.findByPk(id, {
+        attributes: { exclude: ['password'] }, // Excluir información sensible
+        include: [
+            {
+            model: Pedido,
+            as: 'pedidos' // Debe coincidir exactamente con el alias de index.js
+            }
+        ]
+        });
+
+        if (!usuario) {
+        return res.status(404).json({
+            success: false,
+            message: 'Usuario no encontrado'
+        });
+        }
+
+        return res.status(200).json({
+        success: true,
+        data: usuario
+        });
+
+    } catch (error) {
+        console.error('❌ Error al obtener usuario con sus pedidos:', error);
+        return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor al consultar la relación',
+        error: error.message
+        });
     }
 };

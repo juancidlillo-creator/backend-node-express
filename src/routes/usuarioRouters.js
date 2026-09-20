@@ -41,4 +41,8 @@ router.put('/:id', validarActualizacion, usuarioController.actualizarUsuario);
 // Endpoint de eliminar -> Acceso: DELETE /api/usuarios/:id
 router.delete('/:id', usuarioController.eliminarUsuario);
 
+// Relaciones 1:N
+// Ejemplo de consulta: GET /api/usuarios/1/pedidos
+router.get('/:id/pedidos', usuarioController.obtenerUsuarioConPedidos);
+
 export default router;
