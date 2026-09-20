@@ -3,6 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import './src/models/index.js';
 
 // Importación de middleware y router modular
 import { loggerMiddleware } from './middlewares/loggerMiddleware.js';
