@@ -1,4 +1,4 @@
-# Aplicación Web Node.js + Express 
+# Módulo 6 - Aplicación Web Node.js + Express 
 
 Servidor web desarrollado con Node.js y Express.js que abarca desde la creación del servidor base, sirviendo contenido estático y dinámico, hasta la persistencia en archivos planos y la modularización bajo el patrón MVC (Modelo-Vista-Controlador).
 
@@ -83,3 +83,243 @@ Servidor web desarrollado con Node.js y Express.js que abarca desde la creación
 ├── app.js                  # Punto de entrada principal de la aplicación
 ├── package.json            # Configuración de dependencias y scripts de NPM
 └── README.md               # Documentación completa del proyecto
+
+```
+---
+
+### Módulo 7: Acceso de Datos en Aplicaciones Node.js
+
+En esta etapa del proyecto se incorporó la persistencia real con PostgreSQL y Sequelize, pasando de almacenar información en archivos planos a trabajar con una base de datos relacional y un ORM.
+
+## Objetivo del módulo
+
+El objetivo principal fue aprender a:
+
+- conectar una aplicación Express con PostgreSQL;
+- definir modelos con Sequelize;
+- crear relaciones entre entidades;
+- consultar datos mediante ORM y SQL directo;
+- manejar transacciones para garantizar integridad de datos;
+- validar entradas y organizar la API con rutas modularizadas.
+
+---
+
+## 1. Conexión a PostgreSQL con Sequelize
+
+Se creó la configuración de conexión en `src/config/db.js` usando la librería `sequelize` y la variable de entorno `DATABASE_URL`.
+
+```js
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  logging: false,
+  define: { timestamps: true }
+});
+```
+
+Esto permite que la aplicación se conecte a PostgreSQL y opere con modelos definidos en el proyecto.
+
+---
+
+## 2. Modelos y entidades del proyecto
+
+Se definieron dos entidades principales:
+
+### Modelo `Usuario`
+
+Archivo: `src/models/Usuario.js`
+
+Características:
+
+- `id` autoincremental
+- `nombre` requerido
+- `email` único y validado como email
+- `password` obligatorio
+- `estado` con valor por defecto `true`
+- timestamps automáticos (`createdAt`, `updatedAt`)
+
+### Modelo `Pedido`
+
+Archivo: `src/models/Pedido.js`
+
+Características:
+
+- `id` autoincremental
+- `descripcion` obligatoria
+- `monto` decimal con validación mínima
+- `estado` con valores: `pendiente`, `completado`, `cancelado`
+- `usuarioId` como clave foránea
+
+---
+
+## 3. Relaciones entre modelos
+
+En `src/models/index.js` se configuraron las relaciones entre `Usuario` y `Pedido`:
+
+```js
+Usuario.hasMany(Pedido, { foreignKey: 'usuarioId', as: 'pedidos', onDelete: 'CASCADE' });
+Pedido.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
+```
+
+Esto representa una relación de uno a muchos:
+
+- un usuario puede tener muchos pedidos;
+- cada pedido pertenece a un único usuario.
+
+---
+
+## 4. Asociación de modelos al servidor
+
+En `src/app.js` se sincroniza la base de datos al iniciar la aplicación:
+
+```js
+await sequelize.sync({ alter: true });
+```
+
+Con esto, Sequelize crea o actualiza las tablas necesarias según la estructura de los modelos.
+
+---
+
+## 5. API REST con consultas a base de datos
+
+Se modularizaron las rutas en `src/routes/usuarioRouters.js` y se añadieron endpoints para gestionar usuarios y relaciones.
+
+### Endpoints principales
+
+- `GET /api/usuarios` → listar usuarios
+- `POST /api/usuarios` → crear usuario
+- `GET /api/usuarios/:id` → buscar por ID
+- `PUT /api/usuarios/:id` → actualizar usuario
+- `DELETE /api/usuarios/:id` → eliminar usuario
+- `GET /api/usuarios/:id/pedidos` → obtener pedidos de un usuario
+
+Además, se incorporaron dos rutas comparativas importantes:
+
+- `GET /api/usuarios/orm` → consulta usando Sequelize ORM
+- `GET /api/usuarios/sql` → consulta directa con SQL usando el cliente `pg`
+
+---
+
+## 6. ORM vs SQL tradicional
+
+### Uso de ORM (Sequelize)
+
+Se desarrolló el controlador `src/controllers/usuarioOrmController.js` para consultar usuarios con `Usuario.findAll()`.
+
+```js
+const usuarios = await Usuario.findAll({
+  attributes: { exclude: ['password'] }
+});
+```
+
+Ventajas:
+
+- sintaxis más legible;
+- mayor seguridad al encapsular consultas;
+- mejor integración con modelos y relaciones.
+
+### Uso de SQL tradicional
+
+También se usó el cliente `pg` para ejecutar una consulta directa:
+
+```js
+const query = 'SELECT id, nombre, email, estado, "createdAt", "updatedAt" FROM usuarios;';
+const result = await client.query(query);
+```
+
+Esto permite comparar ambos enfoques y entender la diferencia entre abstracción y trabajo directo con SQL.
+
+---
+
+## 7. Validaciones de datos
+
+Se implementaron validaciones en los datos de entrada usando `express-validator` y el middleware `validateUsuario.js`.
+
+Esto permite reforzar la integridad del sistema antes de guardar información, por ejemplo:
+
+- email válido;
+- nombre obligatorio;
+- datos completos antes de crear o actualizar;
+- control previo de errores en la API.
+
+---
+
+## 8. Transaccionalidad
+
+La parte más importante del módulo fue la gestión de transacciones con Sequelize.
+
+Archivo: `src/controllers/transaccionController.js`
+
+Se implementó la creación de un usuario y un pedido dentro de una misma transacción:
+
+```js
+const t = await sequelize.transaction();
+```
+
+Flujo:
+
+1. se crea el usuario;
+2. se crea el pedido asociado;
+3. si todo sale bien, se hace `commit()`;
+4. si ocurre un error, se ejecuta `rollback()`.
+
+Esto garantiza que no queden datos inconsistentes en la base de datos.
+
+Además, si la transacción falla, se registra el detalle en un archivo de logs mediante el helper `registrarFalloTransaccion()`.
+
+---
+
+## 9. Manejo de errores y logs
+
+Se mantuvo la práctica de registrar eventos importantes en archivos de logs para facilitar la depuración.
+
+Por ejemplo, al producirse un fallo en la transacción, se escribe en `logs/transactions.log` la operación y el error asociado.
+
+Esto ayuda a:
+
+- identificar fallas rápidamente;
+- auditar errores de negocio;
+- controlar la integridad del sistema.
+
+---
+
+## 10. Estructura final del proyecto
+
+La estructura quedó así:
+
+```text
+backend-node-express/
+├── src/
+│   ├── app.js
+│   ├── config/
+│   │   └── db.js
+│   ├── controllers/
+│   │   ├── mainController.js
+│   │   ├── transaccionController.js
+│   │   ├── usuarioController.js
+│   │   └── usuarioOrmController.js
+│   ├── helpers/
+│   │   └── logHelper.js
+│   ├── middlewares/
+│   │   ├── loggerMiddleware.js
+│   │   └── validateUsuario.js
+│   ├── models/
+│   │   ├── index.js
+│   │   ├── Pedido.js
+│   │   └── Usuario.js
+│   ├── routes/
+│   │   ├── router.js
+│   │   └── usuarioRouters.js
+├── public/
+│   └── index.html
+├── views/
+│   └── index.hbs
+├── logs/
+│   ├── access.log
+│   └── transactions.log
+├── package.json
+├── .env
+├── .gitignore
+├── README.md
+└── ...
+```
+
