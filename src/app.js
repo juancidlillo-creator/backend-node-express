@@ -14,6 +14,8 @@ import mainRouter from './routes/router.js';
 import usuarioRoutes from './routes/usuarioRouters.js'
 import pedidoRoutes from './routes/pedidoRouters.js';
 import uploadRoutes from './routes/uploadRouters.js';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Inicialización de Express
 const app = express();
@@ -47,6 +49,8 @@ app.use('/', mainRouter);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/pedidos', pedidoRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Inicio del servidor HTTP
 const iniciarServidor = async () => {
